@@ -37,5 +37,8 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
+    setupFiles: ['./src/test/setup.ts'],
+    // Inline Vuetify so Vite transforms its .css imports (Node can't load them).
+    server: { deps: { inline: ['vuetify'] } },
   },
 })

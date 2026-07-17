@@ -42,10 +42,16 @@ export function formatMoney(minor: number, currency: string, locale?: string): s
 
 /** Parse a major-unit value (number or string like "12.34" / "۱۲٫۳۴") into minor units. */
 export function toMinor(major: number | string, currency: string): number {
-  const value =
-    typeof major === 'string'
-      ? parseFloat(normalizeDigits(major).replace(/[^\d.-]/g, ''))
-      : major
+  let value: number
+  if (typeof major === 'string') {
+    const normalized = normalizeDigits(major)
+      .replace(/[٫]/g, '.') // Persian/Arabic decimal separator -> dot
+      .replace(/[,٬\s]/g, '') // thousands separators (Latin, Persian) and spaces
+      .replace(/[^\d.-]/g, '')
+    value = parseFloat(normalized)
+  } else {
+    value = major
+  }
   if (!Number.isFinite(value)) return 0
   return Math.round(value * 10 ** fractionDigits(currency))
 }
