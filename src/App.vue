@@ -28,6 +28,9 @@ const themeIcon = computed(
   () => themeOptions.find((o) => o.mode === themeMode.value)?.icon ?? 'mdi-theme-light-dark',
 )
 
+// Back points left in LTR, right in RTL.
+const backIcon = computed(() => (locale.value === 'fa' ? 'mdi-arrow-right' : 'mdi-arrow-left'))
+
 function leaveTrip() {
   store.setActiveTrip(null)
   router.push({ name: 'trips' })
@@ -37,7 +40,7 @@ function leaveTrip() {
 <template>
   <v-app>
     <v-app-bar color="surface" flat border>
-      <v-btn v-if="activeTrip" icon="mdi-arrow-left" @click="leaveTrip" />
+      <v-btn v-if="activeTrip" :icon="backIcon" @click="leaveTrip" />
       <v-app-bar-title>
         {{ activeTrip ? activeTrip.name : t('app.brand') }}
       </v-app-bar-title>
