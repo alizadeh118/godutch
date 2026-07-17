@@ -1,0 +1,35 @@
+import 'vuetify/styles'
+import '@mdi/font/css/materialdesignicons.css'
+// Vazirmatn covers both Latin and Persian glyphs; self-hosted for offline PWA use.
+import '@fontsource/vazirmatn/400.css'
+import '@fontsource/vazirmatn/500.css'
+import '@fontsource/vazirmatn/700.css'
+
+import { createVuetify } from 'vuetify'
+import { useI18n } from 'vue-i18n'
+import { createVueI18nAdapter } from 'vuetify/locale/adapters/vue-i18n'
+import i18n, { initialLocale } from '@/i18n'
+
+export default createVuetify({
+  locale: {
+    // vue-i18n's strict locale typing ('en' | 'fa') is narrower than the
+    // adapter's `string` signature; the runtime contract is satisfied.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    adapter: createVueI18nAdapter({ i18n: i18n as any, useI18n }),
+    // Vuetify follows i18n's locale via the adapter; this map flips direction.
+    rtl: { fa: true, en: false },
+  },
+  theme: {
+    defaultTheme: 'light',
+    themes: {
+      light: {
+        colors: {
+          primary: '#1867c0',
+          secondary: '#5cbbf6',
+        },
+      },
+    },
+  },
+})
+
+export { initialLocale }

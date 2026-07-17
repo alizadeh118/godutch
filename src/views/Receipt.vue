@@ -1,195 +1,101 @@
-<template>
-
-    <div>
-
-        <v-layout align-center>
-            <v-flex>
-                <v-text-field label="New person" ref="form" required :value="person" @change="v => person=v"
-                              :rules="rules" @keypress.enter="addPerson" class="text-capitalize" validate-on-blur></v-text-field>
-            </v-flex>
-            <v-flex shrink>
-                <v-btn class="primary px-2 mr-0" @click="addPerson" depressed>Add</v-btn>
-            </v-flex>
-        </v-layout>
-
-        <v-list two-line class="transparent">
-            <template v-for="(person,id,index) in people">
-
-                <v-list-tile :key="id" :to="'/receipt/' + id">
-
-                    <v-list-tile-content>
-
-                        <v-list-tile-title>
-                            <span class="text-capitalize">{{person.name}}</span>:
-
-                            <b>{{ Math.round(Math.abs(person.debt)) | currency }}</b>
-
-                        </v-list-tile-title>
-
-                        <v-list-tile-sub-title>
-
-                            <span v-show="person.debt > 0" class="red--text">must pay</span>
-                            <span v-show="person.debt < 0" class="green--text">must be paid</span>
-                            <span v-show="person.debt === 0" class="grey--text text--darken-2">has nothing to do</span>
-
-                        </v-list-tile-sub-title>
-
-                    </v-list-tile-content>
-
-                    <v-list-tile-action>
-
-                        <v-btn icon ripple small :to="'/receipt/' + id">
-                            <v-icon small color="grey">fa-info-circle</v-icon>
-                        </v-btn>
-
-
-                        <!--<v-btn icon ripple small @click="removePerson(person)"-->
-                        <!--v-if="!$store.getters.getPersonPay(id)">-->
-                        <!--<v-icon small color="grey">fa-trash-alt</v-icon>-->
-                        <!--</v-btn>-->
-                        <!--<v-btn icon ripple small @click="editPerson(person)" v-else>-->
-                        <!--<v-icon small color="grey">fa-user-edit</v-icon>-->
-                        <!--</v-btn>-->
-                    </v-list-tile-action>
-
-                </v-list-tile>
-
-                <v-divider :key="person.name" v-if="index < Object.keys(people).length - 1"></v-divider>
-            </template>
-        </v-list>
-
-        <p class="copyright">made with <v-icon small color="red lighten-2">fa-heart</v-icon> by <a target="_blank" href="https://alizadeh118.ir/">me</a></p>
-
-        <v-dialog :value="newPerson" max-width="600px">
-
-            <v-card>
-                <v-toolbar dark color="primary">
-
-                    <v-toolbar-title>Person Name</v-toolbar-title>
-
-                    <v-spacer></v-spacer>
-
-                    <v-toolbar-items>
-                        <v-btn dark flat @click="updatePerson">Save</v-btn>
-
-                    </v-toolbar-items>
-                </v-toolbar>
-
-                <v-card-text>
-                    <v-container grid-list-lg fluid>
-                        <v-layout>
-                            <v-flex>
-                                <v-form ref="updateForm" @submit.prevent="updatePerson">
-
-                                    <v-text-field label="Name" required v-model="newPerson.name" ref="newPerson"
-                                                  :rules="rules" @focus="$event.target.select()"
-                                                  validate-on-blur></v-text-field>
-
-                                </v-form>
-                            </v-flex>
-                        </v-layout>
-                    </v-container>
-                </v-card-text>
-
-            </v-card>
-
-        </v-dialog>
-
-    </div>
-
-</template>
-
-<script>
-
-
-    export default {
-
-        data() {
-            return {
-
-                person: '',
-                newPerson: '',
-                error: false,
-                rules: [
-                    v => !!v || 'Required',
-                    v => !!v && !this.$store.state._people.some(person => person.name.toLowerCase() === v.toLowerCase()) || 'already exists',
-                ],
-
-            }
-        },
-
-        computed: {
-            people() {
-                return this.$store.getters.people
-            }
-        },
-        methods: {
-
-            addPerson() {
-
-
-                if (!this.$refs.form.validate()) return;
-
-                this.person = this.person.charAt(0).toUpperCase() + this.person.slice(1)
-
-                this.$store.dispatch("addPerson", this.person)
-                    .then(() => {
-
-                        this.$storage.set('people', this.$store.state._people)
-
-                        this.$refs.form.reset()
-                        this.person = ''
-
-                    })
-
-            },
-
-            removePerson(person) {
-
-                this.$store.dispatch("removePerson", person)
-                this.$storage.set('people', this.$store.state._people)
-
-            },
-
-            editPerson(person) {
-
-                this.newPerson = {...person}
-                setTimeout(() => this.$refs.newPerson.focus())
-
-            },
-
-            updatePerson() {
-
-
-                if (!this.$refs.updateForm.validate()) return;
-
-                this.$store.dispatch("updatePerson", this.newPerson)
-                    .then(() => {
-
-                        this.newPerson = ''
-                        this.$storage.set('people', this.$store.state._people)
-
-                    })
-
-            }
-
-        },
-
-
-    }
+<script setup lang="ts">
+import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import { storeToRefs } from 'pinia'
+import { useTripsStore } from '@/stores/trips'
+import { useMoney } from '@/composables/useMoney'
+
+const store = useTripsStore()
+const router = useRouter()
+const { t } = useI18n()
+const { money } = useMoney()
+const { people, balances, settlement, peopleById } = storeToRefs(store)
+
+const absMoney = (minor: number) => money(Math.abs(minor))
+
+const newName = ref('')
+const nameError = computed(() => {
+  const v = newName.value.trim().toLowerCase()
+  if (!v) return ''
+  if (people.value.some((p) => p.name.toLowerCase() === v)) return t('common.alreadyExists')
+  return ''
+})
+
+function addPerson() {
+  const name = newName.value.trim()
+  if (!name || nameError.value) return
+  store.addPerson(name.charAt(0).toUpperCase() + name.slice(1))
+  newName.value = ''
+}
+
+function openPerson(id: string) {
+  router.push({ name: 'person-receipt', params: { personId: id } })
+}
 </script>
 
-<style>
-    .text-capitalize input {
-        text-transform: capitalize;
-    }
-    .copyright {
-        position: absolute;
-        text-align: center;
-        opacity: .9;
-        bottom: 1em;
-        margin: 0;
-        left:0;
-        right:0;
-    }
-</style>
+<template>
+  <div>
+    <div class="d-flex align-center ga-2 mb-2">
+      <v-text-field
+        v-model="newName"
+        :label="t('receipt.newPerson')"
+        :error-messages="nameError"
+        hide-details="auto"
+        density="comfortable"
+        @keyup.enter="addPerson"
+      />
+      <v-btn color="primary" :disabled="!newName.trim() || !!nameError" @click="addPerson">
+        {{ t('common.add') }}
+      </v-btn>
+    </div>
+
+    <v-list v-if="people.length" lines="two">
+      <v-list-item
+        v-for="person in people"
+        :key="person.id"
+        :title="`${person.name} — ${absMoney(balances[person.id] ?? 0)}`"
+        @click="openPerson(person.id)"
+      >
+        <template #subtitle>
+          <span v-if="(balances[person.id] ?? 0) < 0" class="text-error">
+            {{ t('receipt.mustPay') }}
+          </span>
+          <span v-else-if="(balances[person.id] ?? 0) > 0" class="text-success">
+            {{ t('receipt.getsBack') }}
+          </span>
+          <span v-else class="text-medium-emphasis">{{ t('receipt.settled') }}</span>
+        </template>
+        <template #append>
+          <v-icon color="grey">mdi-chevron-right</v-icon>
+        </template>
+      </v-list-item>
+    </v-list>
+
+    <v-card v-else variant="tonal" class="text-center pa-8">
+      <v-icon size="64" color="grey">mdi-account-group-outline</v-icon>
+      <p class="mt-3 text-medium-emphasis">{{ t('receipt.empty') }}</p>
+    </v-card>
+
+    <template v-if="settlement.length">
+      <v-divider class="my-4" />
+      <h3 class="text-subtitle-1 mb-2">{{ t('receipt.settleUp') }}</h3>
+      <v-list density="compact">
+        <v-list-item v-for="(txn, i) in settlement" :key="i">
+          <template #prepend>
+            <v-icon color="primary" class="me-2">mdi-arrow-right-thin</v-icon>
+          </template>
+          <v-list-item-title>
+            {{
+              t('receipt.pays', {
+                from: peopleById[txn.from],
+                to: peopleById[txn.to],
+                amount: money(txn.amount),
+              })
+            }}
+          </v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </template>
+  </div>
+</template>

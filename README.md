@@ -1,29 +1,33 @@
-# godutch
+# GoDutch
 
-## Project setup
-```
-npm install
-```
+A small offline-first PWA for splitting shared expenses on trips. Add people,
+log who paid for what and how it's shared, and GoDutch computes each person's
+balance and the minimal set of payments to settle up.
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+## Stack
 
-### Compiles and minifies for production
-```
-npm run build
-```
+- **Vue 3** + `<script setup>` + **TypeScript**
+- **Vite** build + **vite-plugin-pwa** (offline / installable)
+- **Pinia** state, persisted to `localStorage`
+- **Vuetify 3** UI
+- **Vitest** for the money/settlement domain logic
 
-### Run your tests
-```
-npm run test
-```
+## Architecture
 
-### Lints and fixes files
-```
-npm run lint
-```
+- `src/domain/` — pure, framework-free, fully unit-tested logic:
+  - `money.ts` — integer minor-unit splitting (no floats; parts always sum to the whole)
+  - `settle.ts` — net balances + greedy minimal-transaction settle-up
+- `src/stores/trips.ts` — Pinia store: multiple trips, each with its own people, expenses, and currency
+- `src/views/`, `src/components/` — Vuetify UI
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## Develop
+
+```
+pnpm install
+pnpm dev         # dev server with HMR
+pnpm test        # run unit tests
+pnpm typecheck   # vue-tsc
+pnpm lint        # eslint --fix
+pnpm build       # production build + PWA service worker
+pnpm preview     # preview the production build
+```

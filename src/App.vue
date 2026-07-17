@@ -1,139 +1,129 @@
+<script setup lang="ts">
+import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import { storeToRefs } from 'pinia'
+import { useTripsStore } from '@/stores/trips'
+import { formatMoney } from '@/composables/useMoney'
+import { SUPPORTED_LOCALES, setLocale, localeMeta, type LocaleCode } from '@/i18n'
+
+const store = useTripsStore()
+const router = useRouter()
+const { t, locale } = useI18n()
+const { activeTrip, perPerson, currency } = storeToRefs(store)
+
+const perPersonLabel = computed(() =>
+  perPerson.value
+    ? formatMoney(perPerson.value, currency.value, localeMeta(locale.value as LocaleCode).intl)
+    : '',
+)
+
+const resetDialog = ref(false)
+
+function leaveTrip() {
+  store.setActiveTrip(null)
+  router.push({ name: 'trips' })
+}
+
+function clearTripData() {
+  const trip = activeTrip.value
+  if (trip) {
+    trip.people = []
+    trip.expenses = []
+  }
+  resetDialog.value = false
+  router.push({ name: 'receipt' })
+}
+</script>
+
 <template>
-    <v-app>
+  <v-app>
+    <v-app-bar color="surface" flat border>
+      <v-btn v-if="activeTrip" icon="mdi-arrow-left" @click="leaveTrip" />
+      <v-app-bar-title>
+        {{ activeTrip ? activeTrip.name : t('app.brand') }}
+      </v-app-bar-title>
 
-        <v-content>
+      <v-spacer />
 
-            <v-toolbar app>
-                <v-toolbar-title>GoDutch</v-toolbar-title>
-                <v-spacer></v-spacer>
-                <v-chip color="blue-grey darken-1" text-color="white" disabled v-show="$store.getters.totalCostPerPerson">
-                    PerPerson:
-                    <b class="ml-1">{{Math.round($store.getters.totalCostPerPerson) | currency}}</b>
-                </v-chip>
-                <v-btn icon @click="cleanDialog = true">
-                    <v-icon color="grey darken-1">fa-redo-alt</v-icon>
-                </v-btn>
-            </v-toolbar>
+      <v-chip v-if="perPersonLabel" color="blue-grey" variant="flat" class="mr-2">
+        {{ t('app.perPerson') }}: <strong class="ms-1">{{ perPersonLabel }}</strong>
+      </v-chip>
 
-            <v-container fluid fill-height>
-                <v-layout fluid fill-height wrap>
-                    <v-flex>
-                        <transition name="fade" mode="out-in">
-                            <router-view/>
-                        </transition>
-                    </v-flex>
-                </v-layout>
-            </v-container>
+      <v-menu>
+        <template #activator="{ props }">
+          <v-btn icon="mdi-translate" v-bind="props" :aria-label="t('app.language')" />
+        </template>
+        <v-list density="compact">
+          <v-list-item
+            v-for="l in SUPPORTED_LOCALES"
+            :key="l.code"
+            :title="l.label"
+            :active="locale === l.code"
+            @click="setLocale(l.code)"
+          />
+        </v-list>
+      </v-menu>
 
-            <v-bottom-nav app :value="true">
+      <v-btn v-if="activeTrip" icon="mdi-refresh" @click="resetDialog = true" />
+    </v-app-bar>
 
-                <v-btn color="secondary" flat to="/receipt" exact>
-                    <span>Receipt</span>
-                    <v-icon>fa-receipt</v-icon>
-                </v-btn>
+    <v-main>
+      <v-container>
+        <router-view v-slot="{ Component }">
+          <transition name="fade" mode="out-in">
+            <component :is="Component" />
+          </transition>
+        </router-view>
+      </v-container>
+    </v-main>
 
-                <v-btn color="secondary" flat to="/add" exact>
-                    <span>Add Item</span>
-                    <v-icon>fa-plus-circle</v-icon>
-                </v-btn>
+    <v-bottom-navigation v-if="activeTrip" grow color="primary">
+      <v-btn :to="{ name: 'receipt' }" exact>
+        <v-icon>mdi-receipt-text</v-icon>
+        <span>{{ t('nav.receipt') }}</span>
+      </v-btn>
+      <v-btn :to="{ name: 'add' }" exact>
+        <v-icon>mdi-plus-circle</v-icon>
+        <span>{{ t('nav.add') }}</span>
+      </v-btn>
+      <v-btn :to="{ name: 'items' }" exact>
+        <v-icon>mdi-format-list-bulleted</v-icon>
+        <span>{{ t('nav.items') }}</span>
+      </v-btn>
+    </v-bottom-navigation>
 
-                <v-btn color="secondary" flat to="/items" exact>
-                    <span>Items</span>
-                    <v-icon>fa-list</v-icon>
-                </v-btn>
-
-            </v-bottom-nav>
-
-            <v-dialog v-model="cleanDialog" max-width="600px">
-
-                <v-card>
-
-                    <v-card-title class="headline red white--text" >
-                        Refresh the app
-                    </v-card-title>
-
-                    <v-card-text>
-                        <p>All the data will be lost<br>Do you want to refresh the app?</p>
-                        <v-btn @click="refresh">Yes</v-btn>
-                        <v-btn color="primary" @click="cleanDialog = false">No</v-btn>
-                    </v-card-text>
-
-                </v-card>
-
-            </v-dialog>
-
-        </v-content>
-
-    </v-app>
-
+    <v-dialog v-model="resetDialog" max-width="420">
+      <v-card>
+        <v-card-title class="text-error">{{ t('reset.title') }}</v-card-title>
+        <v-card-text>
+          <i18n-t keypath="reset.body" tag="span">
+            <template #name>
+              <strong>{{ activeTrip?.name }}</strong>
+            </template>
+          </i18n-t>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn variant="text" @click="resetDialog = false">{{ t('common.cancel') }}</v-btn>
+          <v-btn color="error" variant="flat" @click="clearTripData">{{ t('common.reset') }}</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </v-app>
 </template>
 
-
 <style>
-    #app {
-        font-family: 'Roboto', sans-serif;
-        /*font-weight: lighter;*/
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        text-align: center;
-        color: #2c3e50;
-    }
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.25s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
 
-    .fade-enter-active, .face-leave-active {
-        transition: all 1s;
-    }
-
-    .fade-enter, .fade-leave-to {
-        opacity: 0;
-    }
-
-    .flex-column {
-        flex-direction: column;
-    }
-
-    .position-relative {
-        position: relative;
-    }
-
-    .position-absolute {
-        position: absolute;
-    }
-
-    input[readonly] {
-        caret-color: transparent !important;
-    }
+body {
+  font-family: 'Vazirmatn', 'Roboto', sans-serif;
+}
 </style>
-
-
-<script>
-    export default {
-
-        data() {
-            return {
-                cleanDialog: false
-            }
-        },
-
-        methods: {
-
-            refresh() {
-                this.$store.state._items = []
-                this.$store.state._people = []
-                this.$storage.clear()
-                this.cleanDialog = false
-                this.$router.push('/receipt')
-            }
-        },
-
-        created() {
-
-            if (this.$storage.get('items'))
-                this.$store.dispatch("setItems", this.$storage.get('items'))
-
-            if (this.$storage.get('people'))
-                this.$store.dispatch("setPeople", this.$storage.get('people'))
-
-        }
-
-    }
-</script>
