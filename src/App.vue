@@ -155,8 +155,4 @@ function clearTripData() {
 .fade-leave-to {
   opacity: 0;
 }
-
-body {
-  font-family: 'Vazirmatn', 'Roboto', sans-serif;
-}
 </style>

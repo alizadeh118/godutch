@@ -1,0 +1,6 @@
+// Vuetify SASS variable overrides. Compiled by vite-plugin-vuetify via the
+// `styles.configFile` option so ALL Vuetify typography (.text-h6, buttons,
+// lists, etc.) uses Vazirmatn — which also covers Persian glyphs.
+@use 'vuetify/settings' with (
+  $body-font-family: ('Vazirmatn', 'Roboto', sans-serif)
+);

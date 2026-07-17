@@ -7,8 +7,9 @@ import { VitePWA } from 'vite-plugin-pwa'
 export default defineConfig({
   plugins: [
     vue(),
-    // Auto-import Vuetify components & styles, tree-shaken.
-    vuetify({ autoImport: true }),
+    // Auto-import Vuetify components & styles, tree-shaken. The configFile
+    // recompiles Vuetify's styles with our SASS variable overrides (fonts).
+    vuetify({ autoImport: true, styles: { configFile: 'src/styles/settings.scss' } }),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'robots.txt', 'img/icons/*.png', 'img/icons/*.svg'],
