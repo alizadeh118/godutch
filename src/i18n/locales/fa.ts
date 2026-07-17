@@ -4,6 +4,12 @@ export default {
     perPerson: 'هر نفر',
     language: 'زبان',
   },
+  theme: {
+    label: 'پوسته',
+    light: 'روشن',
+    dark: 'تیره',
+    auto: 'سیستم',
+  },
   nav: {
     receipt: 'صورت‌حساب',
     add: 'افزودن',

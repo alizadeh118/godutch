@@ -9,6 +9,7 @@ import { createVuetify } from 'vuetify'
 import { useI18n } from 'vue-i18n'
 import { createVueI18nAdapter } from 'vuetify/locale/adapters/vue-i18n'
 import i18n, { initialLocale } from '@/i18n'
+import { resolveTheme } from '@/theme'
 
 export default createVuetify({
   locale: {
@@ -20,11 +21,20 @@ export default createVuetify({
     rtl: { fa: true, en: false },
   },
   theme: {
-    defaultTheme: 'light',
+    // Resolve up front so there's no flash of the wrong theme on load.
+    defaultTheme: resolveTheme(),
     themes: {
       light: {
+        dark: false,
         colors: {
           primary: '#1867c0',
+          secondary: '#5cbbf6',
+        },
+      },
+      dark: {
+        dark: true,
+        colors: {
+          primary: '#2196f3',
           secondary: '#5cbbf6',
         },
       },

@@ -1,16 +1,33 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { useTheme } from 'vuetify'
 import { storeToRefs } from 'pinia'
 import { useTripsStore } from '@/stores/trips'
 import { formatMoney } from '@/composables/useMoney'
 import { SUPPORTED_LOCALES, setLocale, localeMeta, type LocaleCode } from '@/i18n'
+import { themeMode, setThemeMode, resolveTheme, type ThemeMode } from '@/theme'
 
 const store = useTripsStore()
 const router = useRouter()
 const { t, locale } = useI18n()
 const { activeTrip, perPerson, currency } = storeToRefs(store)
+
+// Keep Vuetify's active theme in sync with the chosen mode (and the OS, in auto).
+const vuetifyTheme = useTheme()
+watchEffect(() => {
+  vuetifyTheme.global.name.value = resolveTheme(themeMode.value)
+})
+
+const themeOptions: { mode: ThemeMode; icon: string }[] = [
+  { mode: 'light', icon: 'mdi-white-balance-sunny' },
+  { mode: 'dark', icon: 'mdi-weather-night' },
+  { mode: 'auto', icon: 'mdi-theme-light-dark' },
+]
+const themeIcon = computed(
+  () => themeOptions.find((o) => o.mode === themeMode.value)?.icon ?? 'mdi-theme-light-dark',
+)
 
 const perPersonLabel = computed(() =>
   perPerson.value
@@ -49,6 +66,22 @@ function clearTripData() {
       <v-chip v-if="perPersonLabel" color="blue-grey" variant="flat" class="mr-2">
         {{ t('app.perPerson') }}: <strong class="ms-1">{{ perPersonLabel }}</strong>
       </v-chip>
+
+      <v-menu>
+        <template #activator="{ props }">
+          <v-btn :icon="themeIcon" v-bind="props" :aria-label="t('theme.label')" />
+        </template>
+        <v-list density="compact">
+          <v-list-item
+            v-for="o in themeOptions"
+            :key="o.mode"
+            :title="t(`theme.${o.mode}`)"
+            :prepend-icon="o.icon"
+            :active="themeMode === o.mode"
+            @click="setThemeMode(o.mode)"
+          />
+        </v-list>
+      </v-menu>
 
       <v-menu>
         <template #activator="{ props }">

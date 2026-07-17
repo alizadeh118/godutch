@@ -4,6 +4,12 @@ export default {
     perPerson: 'Per person',
     language: 'Language',
   },
+  theme: {
+    label: 'Theme',
+    light: 'Light',
+    dark: 'Dark',
+    auto: 'System',
+  },
   nav: {
     receipt: 'Receipt',
     add: 'Add',
