@@ -4,7 +4,7 @@ import { useTripsStore } from './trips'
 
 function setup() {
   const store = useTripsStore()
-  store.createTrip('Trip', 'USD')
+  store.createTrip('Trip')
   const ann = store.addPerson('Ann')!
   const bob = store.addPerson('Bob')!
   const cy = store.addPerson('Cy')!
@@ -19,10 +19,9 @@ describe('trips store', () => {
   describe('trips', () => {
     it('creates a trip and makes it active', () => {
       const store = useTripsStore()
-      const id = store.createTrip('Kish', 'EUR')
+      const id = store.createTrip('Kish')
       expect(store.activeTripId).toBe(id)
       expect(store.activeTrip?.name).toBe('Kish')
-      expect(store.currency).toBe('EUR')
       expect(store.people).toEqual([])
     })
 

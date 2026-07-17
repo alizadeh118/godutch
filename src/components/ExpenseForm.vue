@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import type { Expense, ID } from '@/domain/types'
 import { useTripsStore } from '@/stores/trips'
-import { toMajor, toMinor } from '@/composables/useMoney'
+import { parseAmount } from '@/composables/useAmount'
 
 const { t } = useI18n()
 
@@ -12,7 +12,7 @@ const props = defineProps<{ expense?: Expense }>()
 const emit = defineEmits<{ submit: [data: Omit<Expense, 'id'> & { id?: ID }] }>()
 
 const store = useTripsStore()
-const { people, expenses, currency } = storeToRefs(store)
+const { people, expenses } = storeToRefs(store)
 
 interface FormState {
   title: string
@@ -48,7 +48,7 @@ function blankForm(): FormState {
 function fromExpense(e: Expense): FormState {
   return {
     title: e.title,
-    price: String(toMajor(e.amount, currency.value)),
+    price: String(e.amount),
     payerId: e.payerId,
     shareIds: [...e.shareIds],
   }
@@ -67,7 +67,7 @@ const rules = {
   required: (v: unknown) => !!v || t('common.required'),
   requiredArray: (v: unknown[]) => v.length > 0 || t('common.pickAtLeastOne'),
   price: (v: string) =>
-    /^[\d٠-٩۰-۹]+([.٫]\d+)?$/.test(v.replace(/[,٬]/g, '')) || t('common.numbersOnly'),
+    /^[\d٠-٩۰-۹]+$/.test(v.replace(/[,٬\s]/g, '')) || t('common.numbersOnly'),
 }
 
 const noPeople = computed(() => people.value.length === 0)
@@ -80,7 +80,7 @@ async function submit(): Promise<boolean> {
   const data = {
     ...(props.expense ? { id: props.expense.id } : {}),
     title,
-    amount: toMinor(form.price, currency.value),
+    amount: parseAmount(form.price),
     payerId: form.payerId,
     shareIds: [...form.shareIds],
   }
@@ -108,8 +108,7 @@ defineExpose({ submit })
     <v-text-field
       v-model="form.price"
       :label="t('expense.price')"
-      inputmode="decimal"
-      :prefix="currency"
+      inputmode="numeric"
       :rules="[rules.required, rules.price]"
       prepend-inner-icon="mdi-cash"
       class="mb-2"

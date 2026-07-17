@@ -24,7 +24,7 @@ describe('ExpenseForm', () => {
     pinia = createPinia()
     setActivePinia(pinia)
     const store = useTripsStore()
-    store.createTrip('Trip', 'USD')
+    store.createTrip('Trip')
     ann = store.addPerson('Ann')!
     bob = store.addPerson('Bob')!
   })
@@ -35,7 +35,7 @@ describe('ExpenseForm', () => {
     const wrapper = mountForm()
     const fields = wrapper.findAllComponents({ name: 'VTextField' })
     await fields[0].find('input').setValue('dinner') // title
-    await fields[1].find('input').setValue('12.50') // price
+    await fields[1].find('input').setValue('2500') // price (whole number)
 
     const ok = await (wrapper.vm as unknown as Exposed).submit()
     await flushPromises()
@@ -45,7 +45,7 @@ describe('ExpenseForm', () => {
     expect(emitted).toBeTruthy()
     const payload = emitted![0][0] as SubmitPayload
     expect(payload.title).toBe('Dinner') // capitalized
-    expect(payload.amount).toBe(1250) // integer minor units
+    expect(payload.amount).toBe(2500) // stored as-is (whole number)
     expect(payload.payerId).toBe(ann) // default payer = first person
     expect(payload.shareIds).toEqual([ann, bob]) // default share = everyone
   })

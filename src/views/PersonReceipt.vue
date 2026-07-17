@@ -6,7 +6,7 @@ import { storeToRefs } from 'pinia'
 import type { ID } from '@/domain/types'
 import { useTripsStore } from '@/stores/trips'
 import { splitEvenly } from '@/domain/money'
-import { useMoney } from '@/composables/useMoney'
+import { useAmount } from '@/composables/useAmount'
 import { avatarColor, initials } from '@/composables/useAvatar'
 import EditPerson from '@/components/EditPerson.vue'
 import RemovePerson from '@/components/RemovePerson.vue'
@@ -16,7 +16,7 @@ const props = defineProps<{ personId: ID }>()
 const store = useTripsStore()
 const router = useRouter()
 const { t, locale } = useI18n()
-const { money } = useMoney()
+const { format } = useAmount()
 const { people, expenses, balances, peopleById } = storeToRefs(store)
 
 const listSeparator = computed(() => (locale.value === 'fa' ? '، ' : ', '))
@@ -27,8 +27,8 @@ const balance = computed(() => balances.value[props.personId] ?? 0)
 
 const headerBalance = computed(() => {
   const b = balance.value
-  if (b < 0) return { color: 'error', text: `${t('receipt.mustPay')} ${money(-b)}` }
-  if (b > 0) return { color: 'success', text: `${t('receipt.getsBack')} ${money(b)}` }
+  if (b < 0) return { color: 'error', text: `${t('receipt.mustPay')} ${format(-b)}` }
+  if (b > 0) return { color: 'success', text: `${t('receipt.getsBack')} ${format(b)}` }
   return { color: undefined, text: t('person.settledUp') }
 })
 
@@ -92,7 +92,7 @@ watchEffect(() => {
                 }}
               </v-list-item-subtitle>
               <template #append>
-                <span class="font-weight-bold">{{ money(item.portion) }}</span>
+                <span class="font-weight-bold">{{ format(item.portion) }}</span>
               </template>
             </v-list-item>
             <v-divider />
@@ -101,7 +101,7 @@ watchEffect(() => {
                 {{ t('person.costs') }}
               </v-list-item-title>
               <template #append>
-                <span class="font-weight-bold text-primary">{{ money(totalCost) }}</span>
+                <span class="font-weight-bold text-primary">{{ format(totalCost) }}</span>
               </template>
             </v-list-item>
           </v-list>
@@ -121,7 +121,7 @@ watchEffect(() => {
                 }}
               </v-list-item-subtitle>
               <template #append>
-                <span class="font-weight-bold">{{ money(item.amount) }}</span>
+                <span class="font-weight-bold">{{ format(item.amount) }}</span>
               </template>
             </v-list-item>
             <v-divider />
@@ -130,7 +130,7 @@ watchEffect(() => {
                 {{ t('person.payments') }}
               </v-list-item-title>
               <template #append>
-                <span class="font-weight-bold text-primary">{{ money(totalPay) }}</span>
+                <span class="font-weight-bold text-primary">{{ format(totalPay) }}</span>
               </template>
             </v-list-item>
           </v-list>

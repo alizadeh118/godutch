@@ -16,7 +16,6 @@ export const useTripsStore = defineStore(
     )
     const people = computed(() => activeTrip.value?.people ?? [])
     const expenses = computed(() => activeTrip.value?.expenses ?? [])
-    const currency = computed(() => activeTrip.value?.currency ?? 'USD')
 
     /** person id -> name, for quick lookup in views. */
     const peopleById = computed<Record<ID, string>>(() =>
@@ -34,8 +33,8 @@ export const useTripsStore = defineStore(
     )
 
     // ---- trips -------------------------------------------------------------
-    function createTrip(name: string, currency = 'USD', createdAt = new Date().toISOString()): ID {
-      const trip: Trip = { id: uid(), name, currency, people: [], expenses: [], createdAt }
+    function createTrip(name: string, createdAt = new Date().toISOString()): ID {
+      const trip: Trip = { id: uid(), name, people: [], expenses: [], createdAt }
       trips.value.push(trip)
       activeTripId.value = trip.id
       return trip.id
@@ -103,7 +102,6 @@ export const useTripsStore = defineStore(
       activeTrip,
       people,
       expenses,
-      currency,
       peopleById,
       balances,
       settlement,

@@ -4,13 +4,13 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import { useTripsStore } from '@/stores/trips'
-import { useMoney } from '@/composables/useMoney'
+import { useAmount } from '@/composables/useAmount'
 import { avatarColor, initials } from '@/composables/useAvatar'
 
 const store = useTripsStore()
 const router = useRouter()
 const { t, locale } = useI18n()
-const { money } = useMoney()
+const { format } = useAmount()
 const { people, expenses, balances, settlement, peopleById, totalSpent, perPerson } =
   storeToRefs(store)
 
@@ -43,8 +43,8 @@ function balanceLabel(b: number) {
   return t('receipt.settled')
 }
 function balanceChip(b: number) {
-  if (b < 0) return { color: 'error', text: `− ${money(-b)}` }
-  if (b > 0) return { color: 'success', text: `+ ${money(b)}` }
+  if (b < 0) return { color: 'error', text: `− ${format(-b)}` }
+  if (b > 0) return { color: 'success', text: `+ ${format(b)}` }
   return { color: undefined, text: t('receipt.settled') }
 }
 </script>
@@ -54,7 +54,7 @@ function balanceChip(b: number) {
     <!-- Summary -->
     <v-card v-if="people.length" rounded="lg" elevation="1" class="pa-4">
       <div class="text-overline text-medium-emphasis">{{ t('summary.total') }}</div>
-      <div class="text-h4 font-weight-bold">{{ money(totalSpent) }}</div>
+      <div class="text-h4 font-weight-bold">{{ format(totalSpent) }}</div>
       <div class="d-flex ga-8 mt-3">
         <div>
           <div class="text-h6">{{ people.length }}</div>
@@ -65,7 +65,7 @@ function balanceChip(b: number) {
           <div class="text-caption text-medium-emphasis">{{ t('summary.items') }}</div>
         </div>
         <div>
-          <div class="text-h6">{{ money(perPerson) }}</div>
+          <div class="text-h6">{{ format(perPerson) }}</div>
           <div class="text-caption text-medium-emphasis">{{ t('summary.perPerson') }}</div>
         </div>
       </div>
@@ -147,7 +147,7 @@ function balanceChip(b: number) {
             </v-avatar>
             <span class="font-weight-medium">{{ peopleById[txn.to] }}</span>
             <v-spacer />
-            <span class="font-weight-bold">{{ money(txn.amount) }}</span>
+            <span class="font-weight-bold">{{ format(txn.amount) }}</span>
           </div>
         </v-list-item>
       </v-list>

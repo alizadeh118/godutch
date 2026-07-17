@@ -12,10 +12,6 @@ const { trips } = storeToRefs(store)
 
 const dialog = ref(false)
 const name = ref('')
-const currency = ref('USD')
-
-// A small, common set; the field is free-text so any ISO code works.
-const currencies = ['USD', 'EUR', 'GBP', 'IRR', 'AED', 'TRY', 'CAD', 'AUD', 'JPY']
 
 function openTrip(id: string) {
   store.setActiveTrip(id)
@@ -24,7 +20,7 @@ function openTrip(id: string) {
 
 function createTrip() {
   if (!name.value.trim()) return
-  store.createTrip(name.value.trim(), currency.value)
+  store.createTrip(name.value.trim())
   dialog.value = false
   name.value = ''
   router.push({ name: 'receipt' })
@@ -82,7 +78,6 @@ function confirmDelete() {
               t('trips.summary', {
                 people: trip.people.length,
                 items: trip.expenses.length,
-                currency: trip.currency,
               })
             }}
           </v-list-item-subtitle>
@@ -105,7 +100,6 @@ function confirmDelete() {
         <v-card-title>{{ t('trips.newTrip') }}</v-card-title>
         <v-card-text>
           <v-text-field v-model="name" :label="t('trips.name')" autofocus @keyup.enter="createTrip" />
-          <v-combobox v-model="currency" :items="currencies" :label="t('trips.currency')" />
         </v-card-text>
         <v-card-actions>
           <v-spacer />

@@ -4,12 +4,12 @@ import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import type { Expense, ID } from '@/domain/types'
 import { useTripsStore } from '@/stores/trips'
-import { useMoney } from '@/composables/useMoney'
+import { useAmount } from '@/composables/useAmount'
 import { avatarColor, initials } from '@/composables/useAvatar'
 import ExpenseForm from '@/components/ExpenseForm.vue'
 
 const { t } = useI18n()
-const { money } = useMoney()
+const { format } = useAmount()
 const store = useTripsStore()
 const { expenses, peopleById } = storeToRefs(store)
 
@@ -61,7 +61,7 @@ function remove(id: ID) {
             </v-list-item-subtitle>
             <template #append>
               <div class="d-flex align-center ga-1">
-                <span class="font-weight-bold me-1">{{ money(item.amount) }}</span>
+                <span class="font-weight-bold me-1">{{ format(item.amount) }}</span>
                 <v-btn icon="mdi-pencil" variant="text" size="small" @click="edit(item)" />
                 <v-btn
                   icon="mdi-delete-outline"

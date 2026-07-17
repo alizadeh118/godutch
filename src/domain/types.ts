@@ -9,7 +9,7 @@ export interface Person {
 export interface Expense {
   id: ID
   title: string
-  /** Integer amount in the trip currency's minor units (e.g. cents). Never a float. */
+  /** Plain whole-number amount, in whatever unit the user has in mind. Never a float. */
   amount: number
   /** Person who paid the full amount up front. */
   payerId: ID
@@ -20,8 +20,6 @@ export interface Expense {
 export interface Trip {
   id: ID
   name: string
-  /** ISO-4217 currency code, e.g. 'USD', 'EUR', 'IRR'. */
-  currency: string
   people: Person[]
   expenses: Expense[]
   /** ISO-8601 creation timestamp. */
