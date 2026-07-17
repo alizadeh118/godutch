@@ -61,13 +61,30 @@ watch(
   (e) => Object.assign(form, e ? fromExpense(e) : blankForm()),
 )
 
+/** Keep only digits (ASCII/Persian/Arabic) and a single decimal separator. */
+function sanitizePrice(v: string): string {
+  let s = v.replace(/[^\d۰-۹٠-٩.٫]/g, '')
+  const sep = s.search(/[.٫]/)
+  if (sep !== -1) s = s.slice(0, sep + 1) + s.slice(sep + 1).replace(/[.٫]/g, '')
+  return s
+}
+
+// Reject non-numeric input as it's typed/pasted.
+watch(
+  () => form.price,
+  (v) => {
+    const clean = sanitizePrice(v)
+    if (clean !== v) form.price = clean
+  },
+)
+
 const formRef = ref()
 
 const rules = {
   required: (v: unknown) => !!v || t('common.required'),
   requiredArray: (v: unknown[]) => v.length > 0 || t('common.pickAtLeastOne'),
   price: (v: string) =>
-    /^[\d٠-٩۰-۹]+$/.test(v.replace(/[,٬\s]/g, '')) || t('common.numbersOnly'),
+    /^[\d٠-٩۰-۹]+([.٫][\d٠-٩۰-۹]+)?$/.test(v.replace(/[,٬\s]/g, '')) || t('common.numbersOnly'),
 }
 
 const noPeople = computed(() => people.value.length === 0)
@@ -108,7 +125,7 @@ defineExpose({ submit })
     <v-text-field
       v-model="form.price"
       :label="t('expense.price')"
-      inputmode="numeric"
+      inputmode="decimal"
       :rules="[rules.required, rules.price]"
       prepend-inner-icon="mdi-cash"
       class="mb-2"

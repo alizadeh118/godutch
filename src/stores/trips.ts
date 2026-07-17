@@ -29,7 +29,7 @@ export const useTripsStore = defineStore(
     /** Total of expenses shared by everyone — used for the "per person" chip. */
     const totalSpent = computed(() => expenses.value.reduce((sum, e) => sum + e.amount, 0))
     const perPerson = computed(() =>
-      people.value.length ? Math.round(totalSpent.value / people.value.length) : 0,
+      people.value.length ? totalSpent.value / people.value.length : 0,
     )
 
     // ---- trips -------------------------------------------------------------

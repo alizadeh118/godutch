@@ -50,6 +50,28 @@ describe('ExpenseForm', () => {
     expect(payload.shareIds).toEqual([ann, bob]) // default share = everyone
   })
 
+  it('accepts a decimal price', async () => {
+    const wrapper = mountForm()
+    const fields = wrapper.findAllComponents({ name: 'VTextField' })
+    await fields[0].find('input').setValue('taxi')
+    await fields[1].find('input').setValue('15.750')
+
+    const ok = await (wrapper.vm as unknown as Exposed).submit()
+    await flushPromises()
+
+    expect(ok).toBe(true)
+    expect((wrapper.emitted('submit')![0][0] as SubmitPayload).amount).toBe(15.75)
+  })
+
+  it('strips non-numeric characters from the price field as they are typed', async () => {
+    const wrapper = mountForm()
+    const price = wrapper.findAllComponents({ name: 'VTextField' })[1].find('input')
+    await price.setValue('12a.5b')
+    await flushPromises()
+
+    expect((price.element as HTMLInputElement).value).toBe('12.5')
+  })
+
   it('does not emit when required fields are empty', async () => {
     const wrapper = mountForm()
     const ok = await (wrapper.vm as unknown as Exposed).submit()
