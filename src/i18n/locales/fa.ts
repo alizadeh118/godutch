@@ -63,10 +63,6 @@ export default {
     empty: 'هنوز قلمی ثبت نشده است.',
     paidBy: 'پرداخت‌شده توسط {name}',
   },
-  reset: {
-    title: 'بازنشانی این سفر',
-    body: 'همه‌ی افراد و اقلام در {name} حذف خواهند شد. ادامه می‌دهید؟',
-  },
   common: {
     add: 'افزودن',
     cancel: 'انصراف',
@@ -74,7 +70,6 @@ export default {
     save: 'ذخیره',
     remove: 'حذف',
     delete: 'حذف',
-    reset: 'بازنشانی',
     name: 'نام',
     required: 'الزامی',
     pickAtLeastOne: 'حداقل یک مورد انتخاب کنید',

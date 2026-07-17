@@ -63,10 +63,6 @@ export default {
     empty: 'No items yet.',
     paidBy: 'paid by {name}',
   },
-  reset: {
-    title: 'Reset this trip',
-    body: 'All people and items in {name} will be lost. Continue?',
-  },
   common: {
     add: 'Add',
     cancel: 'Cancel',
@@ -74,7 +70,6 @@ export default {
     save: 'Save',
     remove: 'Remove',
     delete: 'Delete',
-    reset: 'Reset',
     name: 'Name',
     required: 'Required',
     pickAtLeastOne: 'Pick at least one',
