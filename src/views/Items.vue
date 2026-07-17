@@ -3,14 +3,14 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import type { Expense, ID } from '@/domain/types'
-import { useTripsStore } from '@/stores/trips'
+import { useEventsStore } from '@/stores/events'
 import { useAmount } from '@/composables/useAmount'
 import { avatarColor, initials } from '@/composables/useAvatar'
 import ExpenseForm from '@/components/ExpenseForm.vue'
 
 const { t } = useI18n()
 const { format } = useAmount()
-const store = useTripsStore()
+const store = useEventsStore()
 const { expenses, peopleById } = storeToRefs(store)
 
 const dialog = ref(false)

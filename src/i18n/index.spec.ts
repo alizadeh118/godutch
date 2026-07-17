@@ -13,11 +13,11 @@ describe('Persian digit postTranslation', () => {
 
   it('renders interpolated counts with Persian digits under fa', () => {
     setLocale('fa')
-    expect(i18n.global.t('trips.summary', { people: 3, items: 2 })).toBe('۳ نفر · ۲ قلم')
+    expect(i18n.global.t('events.summary', { people: 3, items: 2 })).toBe('۳ نفر · ۲ قلم')
   })
 
   it('leaves ASCII digits under en', () => {
     setLocale('en')
-    expect(i18n.global.t('trips.summary', { people: 3, items: 2 })).toBe('3 people · 2 items')
+    expect(i18n.global.t('events.summary', { people: 3, items: 2 })).toBe('3 people · 2 items')
   })
 })

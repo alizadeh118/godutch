@@ -3,11 +3,11 @@ import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
-import { useTripsStore } from '@/stores/trips'
+import { useEventsStore } from '@/stores/events'
 import { useAmount } from '@/composables/useAmount'
 import { avatarColor, initials } from '@/composables/useAvatar'
 
-const store = useTripsStore()
+const store = useEventsStore()
 const router = useRouter()
 const { t, locale } = useI18n()
 const { format } = useAmount()

@@ -4,14 +4,14 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useTheme } from 'vuetify'
 import { storeToRefs } from 'pinia'
-import { useTripsStore } from '@/stores/trips'
+import { useEventsStore } from '@/stores/events'
 import { SUPPORTED_LOCALES, setLocale } from '@/i18n'
 import { themeMode, setThemeMode, resolveTheme, type ThemeMode } from '@/theme'
 
-const store = useTripsStore()
+const store = useEventsStore()
 const router = useRouter()
 const { t, locale } = useI18n()
-const { activeTrip } = storeToRefs(store)
+const { activeEvent } = storeToRefs(store)
 
 // Keep Vuetify's active theme in sync with the chosen mode (and the OS, in auto).
 const vuetifyTheme = useTheme()
@@ -31,18 +31,18 @@ const themeIcon = computed(
 // Back points left in LTR, right in RTL.
 const backIcon = computed(() => (locale.value === 'fa' ? 'mdi-arrow-right' : 'mdi-arrow-left'))
 
-function leaveTrip() {
-  store.setActiveTrip(null)
-  router.push({ name: 'trips' })
+function leaveEvent() {
+  store.setActiveEvent(null)
+  router.push({ name: 'events' })
 }
 </script>
 
 <template>
   <v-app>
     <v-app-bar color="surface" flat border>
-      <v-btn v-if="activeTrip" :icon="backIcon" @click="leaveTrip" />
+      <v-btn v-if="activeEvent" :icon="backIcon" @click="leaveEvent" />
       <v-app-bar-title>
-        {{ activeTrip ? activeTrip.name : t('app.brand') }}
+        {{ activeEvent ? activeEvent.name : t('app.brand') }}
       </v-app-bar-title>
 
       <v-spacer />
@@ -89,7 +89,7 @@ function leaveTrip() {
       </v-container>
     </v-main>
 
-    <v-bottom-navigation v-if="activeTrip" grow color="primary">
+    <v-bottom-navigation v-if="activeEvent" grow color="primary">
       <v-btn :to="{ name: 'receipt' }" exact>
         <v-icon>mdi-receipt-text</v-icon>
         <span>{{ t('nav.receipt') }}</span>

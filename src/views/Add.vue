@@ -2,11 +2,11 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Expense, ID } from '@/domain/types'
-import { useTripsStore } from '@/stores/trips'
+import { useEventsStore } from '@/stores/events'
 import ExpenseForm from '@/components/ExpenseForm.vue'
 
 const { t } = useI18n()
-const store = useTripsStore()
+const store = useEventsStore()
 const formRef = ref<InstanceType<typeof ExpenseForm>>()
 const snackbar = ref(false)
 

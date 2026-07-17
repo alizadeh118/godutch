@@ -21,13 +21,13 @@ export default {
     people: 'People',
     items: 'Items',
   },
-  trips: {
-    heading: 'Your trips',
-    newTrip: 'New trip',
-    empty: 'No trips yet. Create one to start splitting costs.',
+  events: {
+    heading: 'Your events',
+    newEvent: 'New event',
+    empty: 'No events yet. Create one to start splitting costs.',
     summary: '{people} people · {items} items',
-    name: 'Trip name',
-    deleteTitle: 'Delete trip',
+    name: 'Event name',
+    deleteTitle: 'Delete event',
     deleteBody: 'Delete {name}? This cannot be undone.',
   },
   receipt: {

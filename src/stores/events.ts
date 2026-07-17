@@ -1,21 +1,21 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { Expense, ID, Trip } from '@/domain/types'
+import type { Expense, ID, Event } from '@/domain/types'
 import { computeBalances, settleUp } from '@/domain/settle'
 
 const uid = (): ID => crypto.randomUUID()
 
-export const useTripsStore = defineStore(
-  'trips',
+export const useEventsStore = defineStore(
+  'events',
   () => {
-    const trips = ref<Trip[]>([])
-    const activeTripId = ref<ID | null>(null)
+    const events = ref<Event[]>([])
+    const activeEventId = ref<ID | null>(null)
 
-    const activeTrip = computed<Trip | null>(
-      () => trips.value.find((t) => t.id === activeTripId.value) ?? null,
+    const activeEvent = computed<Event | null>(
+      () => events.value.find((t) => t.id === activeEventId.value) ?? null,
     )
-    const people = computed(() => activeTrip.value?.people ?? [])
-    const expenses = computed(() => activeTrip.value?.expenses ?? [])
+    const people = computed(() => activeEvent.value?.people ?? [])
+    const expenses = computed(() => activeEvent.value?.expenses ?? [])
 
     /** person id -> name, for quick lookup in views. */
     const peopleById = computed<Record<ID, string>>(() =>
@@ -32,33 +32,33 @@ export const useTripsStore = defineStore(
       people.value.length ? totalSpent.value / people.value.length : 0,
     )
 
-    // ---- trips -------------------------------------------------------------
-    function createTrip(name: string, createdAt = new Date().toISOString()): ID {
-      const trip: Trip = { id: uid(), name, people: [], expenses: [], createdAt }
-      trips.value.push(trip)
-      activeTripId.value = trip.id
-      return trip.id
+    // ---- events -------------------------------------------------------------
+    function createEvent(name: string, createdAt = new Date().toISOString()): ID {
+      const event: Event = { id: uid(), name, people: [], expenses: [], createdAt }
+      events.value.push(event)
+      activeEventId.value = event.id
+      return event.id
     }
 
-    function deleteTrip(id: ID) {
-      trips.value = trips.value.filter((t) => t.id !== id)
-      if (activeTripId.value === id) activeTripId.value = null
+    function deleteEvent(id: ID) {
+      events.value = events.value.filter((t) => t.id !== id)
+      if (activeEventId.value === id) activeEventId.value = null
     }
 
-    function setActiveTrip(id: ID | null) {
-      activeTripId.value = id
+    function setActiveEvent(id: ID | null) {
+      activeEventId.value = id
     }
 
     // ---- people ------------------------------------------------------------
     function addPerson(name: string): ID | null {
-      if (!activeTrip.value) return null
+      if (!activeEvent.value) return null
       const id = uid()
-      activeTrip.value.people.push({ id, name })
+      activeEvent.value.people.push({ id, name })
       return id
     }
 
     function updatePerson(id: ID, name: string) {
-      const person = activeTrip.value?.people.find((p) => p.id === id)
+      const person = activeEvent.value?.people.find((p) => p.id === id)
       if (person) person.name = name
     }
 
@@ -67,39 +67,39 @@ export const useTripsStore = defineStore(
      * they are dropped from every share list.
      */
     function removePerson(id: ID, alterPayerId?: ID) {
-      const trip = activeTrip.value
-      if (!trip) return
-      for (const e of trip.expenses) {
+      const event = activeEvent.value
+      if (!event) return
+      for (const e of event.expenses) {
         if (e.payerId === id && alterPayerId) e.payerId = alterPayerId
         e.shareIds = e.shareIds.filter((pid) => pid !== id)
       }
-      trip.people = trip.people.filter((p) => p.id !== id)
+      event.people = event.people.filter((p) => p.id !== id)
     }
 
     // ---- expenses ----------------------------------------------------------
     function addExpense(data: Omit<Expense, 'id'>): ID | null {
-      if (!activeTrip.value) return null
+      if (!activeEvent.value) return null
       const id = uid()
-      activeTrip.value.expenses.push({ id, ...data })
+      activeEvent.value.expenses.push({ id, ...data })
       return id
     }
 
     function updateExpense(expense: Expense) {
-      const trip = activeTrip.value
-      if (!trip) return
-      const idx = trip.expenses.findIndex((e) => e.id === expense.id)
-      if (idx !== -1) trip.expenses[idx] = { ...expense }
+      const event = activeEvent.value
+      if (!event) return
+      const idx = event.expenses.findIndex((e) => e.id === expense.id)
+      if (idx !== -1) event.expenses[idx] = { ...expense }
     }
 
     function removeExpense(id: ID) {
-      const trip = activeTrip.value
-      if (trip) trip.expenses = trip.expenses.filter((e) => e.id !== id)
+      const event = activeEvent.value
+      if (event) event.expenses = event.expenses.filter((e) => e.id !== id)
     }
 
     return {
-      trips,
-      activeTripId,
-      activeTrip,
+      events,
+      activeEventId,
+      activeEvent,
       people,
       expenses,
       peopleById,
@@ -107,9 +107,9 @@ export const useTripsStore = defineStore(
       settlement,
       totalSpent,
       perPerson,
-      createTrip,
-      deleteTrip,
-      setActiveTrip,
+      createEvent,
+      deleteEvent,
+      setActiveEvent,
       addPerson,
       updatePerson,
       removePerson,
@@ -121,7 +121,7 @@ export const useTripsStore = defineStore(
   {
     persist: {
       key: 'godutch',
-      pick: ['trips', 'activeTripId'],
+      pick: ['events', 'activeEventId'],
     },
   },
 )

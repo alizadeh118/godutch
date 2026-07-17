@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { setActivePinia, createPinia, type Pinia } from 'pinia'
 import { flushPromises } from '@vue/test-utils'
 import { mountWith } from '@/test/mount'
-import { useTripsStore } from '@/stores/trips'
+import { useEventsStore } from '@/stores/events'
 import ExpenseForm from './ExpenseForm.vue'
 
 interface Exposed {
@@ -23,8 +23,8 @@ describe('ExpenseForm', () => {
   beforeEach(() => {
     pinia = createPinia()
     setActivePinia(pinia)
-    const store = useTripsStore()
-    store.createTrip('Trip')
+    const store = useEventsStore()
+    store.createEvent('Event')
     ann = store.addPerson('Ann')!
     bob = store.addPerson('Bob')!
   })

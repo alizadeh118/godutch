@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import type { ID } from '@/domain/types'
-import { useTripsStore } from '@/stores/trips'
+import { useEventsStore } from '@/stores/events'
 import { splitEvenly } from '@/domain/money'
 import { useAmount } from '@/composables/useAmount'
 import { avatarColor, initials } from '@/composables/useAvatar'
@@ -13,7 +13,7 @@ import RemovePerson from '@/components/RemovePerson.vue'
 
 const props = defineProps<{ personId: ID }>()
 
-const store = useTripsStore()
+const store = useEventsStore()
 const router = useRouter()
 const { t, locale } = useI18n()
 const { format } = useAmount()
@@ -47,7 +47,7 @@ const paidItems = computed(() => expenses.value.filter((e) => e.payerId === prop
 const totalCost = computed(() => sharedItems.value.reduce((s, i) => s + i.portion, 0))
 const totalPay = computed(() => paidItems.value.reduce((s, i) => s + i.amount, 0))
 
-// If the person was removed / trip switched, go back.
+// If the person was removed / event switched, go back.
 watchEffect(() => {
   if (!person.value) router.replace({ name: 'receipt' })
 })

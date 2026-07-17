@@ -1,10 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useTripsStore } from '@/stores/trips'
+import { useEventsStore } from '@/stores/events'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    { path: '/', name: 'trips', component: () => import('@/views/Trips.vue') },
+    { path: '/', name: 'events', component: () => import('@/views/Events.vue') },
     { path: '/receipt', name: 'receipt', component: () => import('@/views/Receipt.vue') },
     {
       path: '/receipt/:personId',
@@ -17,11 +17,11 @@ const router = createRouter({
   ],
 })
 
-// Views other than the trips list require an active trip.
+// Views other than the events list require an active event.
 router.beforeEach((to) => {
-  if (to.name === 'trips') return true
-  const store = useTripsStore()
-  if (!store.activeTrip) return { name: 'trips' }
+  if (to.name === 'events') return true
+  const store = useEventsStore()
+  if (!store.activeEvent) return { name: 'events' }
   return true
 })
 

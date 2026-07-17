@@ -3,7 +3,7 @@ import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import type { Expense, ID } from '@/domain/types'
-import { useTripsStore } from '@/stores/trips'
+import { useEventsStore } from '@/stores/events'
 import { parseAmount } from '@/composables/useAmount'
 
 const { t } = useI18n()
@@ -11,7 +11,7 @@ const { t } = useI18n()
 const props = defineProps<{ expense?: Expense }>()
 const emit = defineEmits<{ submit: [data: Omit<Expense, 'id'> & { id?: ID }] }>()
 
-const store = useTripsStore()
+const store = useEventsStore()
 const { people, expenses } = storeToRefs(store)
 
 interface FormState {

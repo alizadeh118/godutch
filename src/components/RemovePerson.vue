@@ -4,12 +4,12 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import type { ID } from '@/domain/types'
-import { useTripsStore } from '@/stores/trips'
+import { useEventsStore } from '@/stores/events'
 
 const props = defineProps<{ personId: ID }>()
 
 const { t } = useI18n()
-const store = useTripsStore()
+const store = useEventsStore()
 const router = useRouter()
 const { people, expenses } = storeToRefs(store)
 

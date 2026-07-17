@@ -21,14 +21,14 @@ export default {
     people: 'نفرات',
     items: 'اقلام',
   },
-  trips: {
-    heading: 'سفرهای شما',
-    newTrip: 'سفر جدید',
-    empty: 'هنوز سفری ندارید. برای شروع تقسیم هزینه‌ها یک سفر بسازید.',
+  events: {
+    heading: 'دورهمی‌های شما',
+    newEvent: 'دورهمی جدید',
+    empty: 'هنوز دورهمی‌ای نساخته‌اید. برای شروع تقسیم هزینه‌ها یک دورهمی بسازید.',
     summary: '{people} نفر · {items} قلم',
-    name: 'نام سفر',
-    deleteTitle: 'حذف سفر',
-    deleteBody: 'سفر {name} حذف شود؟ این عمل قابل بازگشت نیست.',
+    name: 'نام دورهمی',
+    deleteTitle: 'حذف دورهمی',
+    deleteBody: 'دورهمی {name} حذف شود؟ این عمل قابل بازگشت نیست.',
   },
   receipt: {
     newPerson: 'فرد جدید',

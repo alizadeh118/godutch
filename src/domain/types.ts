@@ -17,7 +17,7 @@ export interface Expense {
   shareIds: ID[]
 }
 
-export interface Trip {
+export interface Event {
   id: ID
   name: string
   people: Person[]
