@@ -22,6 +22,8 @@ export default {
     summary: '{people} people · {items} items · {currency}',
     name: 'Trip name',
     currency: 'Currency',
+    deleteTitle: 'Delete trip',
+    deleteBody: 'Delete {name}? This cannot be undone.',
   },
   receipt: {
     newPerson: 'New person',
@@ -71,6 +73,7 @@ export default {
     create: 'Create',
     save: 'Save',
     remove: 'Remove',
+    delete: 'Delete',
     reset: 'Reset',
     name: 'Name',
     required: 'Required',

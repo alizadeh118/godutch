@@ -22,6 +22,8 @@ export default {
     summary: '{people} نفر · {items} قلم · {currency}',
     name: 'نام سفر',
     currency: 'واحد پول',
+    deleteTitle: 'حذف سفر',
+    deleteBody: 'سفر {name} حذف شود؟ این عمل قابل بازگشت نیست.',
   },
   receipt: {
     newPerson: 'فرد جدید',
@@ -71,6 +73,7 @@ export default {
     create: 'ایجاد',
     save: 'ذخیره',
     remove: 'حذف',
+    delete: 'حذف',
     reset: 'بازنشانی',
     name: 'نام',
     required: 'الزامی',

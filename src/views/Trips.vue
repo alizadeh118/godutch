@@ -30,8 +30,15 @@ function createTrip() {
   router.push({ name: 'receipt' })
 }
 
-function confirmDelete(id: string) {
-  store.deleteTrip(id)
+const pendingDelete = ref<{ id: string; name: string } | null>(null)
+
+function askDelete(trip: { id: string; name: string }) {
+  pendingDelete.value = { id: trip.id, name: trip.name }
+}
+
+function confirmDelete() {
+  if (pendingDelete.value) store.deleteTrip(pendingDelete.value.id)
+  pendingDelete.value = null
 }
 </script>
 
@@ -75,7 +82,7 @@ function confirmDelete(id: string) {
             variant="text"
             size="small"
             color="grey"
-            @click.stop="confirmDelete(trip.id)"
+            @click.stop="askDelete(trip)"
           />
         </template>
       </v-list-item>
@@ -99,6 +106,24 @@ function confirmDelete(id: string) {
           <v-btn color="primary" variant="flat" :disabled="!name.trim()" @click="createTrip">
             {{ t('common.create') }}
           </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog :model-value="!!pendingDelete" max-width="420" @update:model-value="pendingDelete = null">
+      <v-card>
+        <v-card-title class="text-error">{{ t('trips.deleteTitle') }}</v-card-title>
+        <v-card-text>
+          <i18n-t keypath="trips.deleteBody" tag="span">
+            <template #name>
+              <strong>{{ pendingDelete?.name }}</strong>
+            </template>
+          </i18n-t>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn variant="text" @click="pendingDelete = null">{{ t('common.cancel') }}</v-btn>
+          <v-btn color="error" variant="flat" @click="confirmDelete">{{ t('common.delete') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
