@@ -102,13 +102,16 @@ defineExpose({ submit })
       v-model="form.title"
       :label="t('expense.title')"
       :rules="[rules.required]"
+      prepend-inner-icon="mdi-tag-outline"
       class="mb-2"
     />
     <v-text-field
       v-model="form.price"
       :label="t('expense.price')"
       inputmode="decimal"
+      :prefix="currency"
       :rules="[rules.required, rules.price]"
+      prepend-inner-icon="mdi-cash"
       class="mb-2"
     />
     <v-select
@@ -118,6 +121,7 @@ defineExpose({ submit })
       item-title="name"
       item-value="id"
       :rules="[rules.required]"
+      prepend-inner-icon="mdi-account-cash"
       class="mb-2"
     />
     <v-select
@@ -129,6 +133,7 @@ defineExpose({ submit })
       item-title="name"
       item-value="id"
       :rules="[rules.requiredArray]"
+      prepend-inner-icon="mdi-account-multiple"
     />
   </v-form>
 </template>

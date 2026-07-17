@@ -5,14 +5,13 @@ import { useI18n } from 'vue-i18n'
 import { useTheme } from 'vuetify'
 import { storeToRefs } from 'pinia'
 import { useTripsStore } from '@/stores/trips'
-import { formatMoney } from '@/composables/useMoney'
-import { SUPPORTED_LOCALES, setLocale, localeMeta, type LocaleCode } from '@/i18n'
+import { SUPPORTED_LOCALES, setLocale } from '@/i18n'
 import { themeMode, setThemeMode, resolveTheme, type ThemeMode } from '@/theme'
 
 const store = useTripsStore()
 const router = useRouter()
 const { t, locale } = useI18n()
-const { activeTrip, perPerson, currency } = storeToRefs(store)
+const { activeTrip } = storeToRefs(store)
 
 // Keep Vuetify's active theme in sync with the chosen mode (and the OS, in auto).
 const vuetifyTheme = useTheme()
@@ -27,12 +26,6 @@ const themeOptions: { mode: ThemeMode; icon: string }[] = [
 ]
 const themeIcon = computed(
   () => themeOptions.find((o) => o.mode === themeMode.value)?.icon ?? 'mdi-theme-light-dark',
-)
-
-const perPersonLabel = computed(() =>
-  perPerson.value
-    ? formatMoney(perPerson.value, currency.value, localeMeta(locale.value as LocaleCode).intl)
-    : '',
 )
 
 function leaveTrip() {
@@ -50,10 +43,6 @@ function leaveTrip() {
       </v-app-bar-title>
 
       <v-spacer />
-
-      <v-chip v-if="perPersonLabel" color="blue-grey" variant="flat" class="mr-2">
-        {{ t('app.perPerson') }}: <strong class="ms-1">{{ perPersonLabel }}</strong>
-      </v-chip>
 
       <v-menu>
         <template #activator="{ props }">
@@ -88,7 +77,7 @@ function leaveTrip() {
     </v-app-bar>
 
     <v-main>
-      <v-container>
+      <v-container class="app-column pa-4">
         <router-view v-slot="{ Component }">
           <transition name="fade" mode="out-in">
             <component :is="Component" />
@@ -115,9 +104,16 @@ function leaveTrip() {
 </template>
 
 <style>
+/* Mobile-first column that stays comfortable on desktop. */
+.app-column {
+  max-width: 680px;
+  margin-inline: auto;
+  padding-bottom: 88px; /* clear the fixed bottom navigation */
+}
+
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.25s ease;
+  transition: opacity 0.2s ease;
 }
 .fade-enter-from,
 .fade-leave-to {

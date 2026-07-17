@@ -15,6 +15,12 @@ export default {
     add: 'افزودن',
     items: 'اقلام',
   },
+  summary: {
+    total: 'مجموع هزینه',
+    perPerson: 'هر نفر',
+    people: 'نفرات',
+    items: 'اقلام',
+  },
   trips: {
     heading: 'سفرهای شما',
     newTrip: 'سفر جدید',
@@ -62,6 +68,7 @@ export default {
     update: 'ویرایش قلم',
     empty: 'هنوز قلمی ثبت نشده است.',
     paidBy: 'پرداخت‌شده توسط {name}',
+    splitWays: 'تقسیم بین {count} نفر',
   },
   common: {
     add: 'افزودن',

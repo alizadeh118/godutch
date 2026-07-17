@@ -47,57 +47,64 @@ function confirmDelete() {
     <div class="d-flex align-center mb-4">
       <h2 class="text-h6">{{ t('trips.heading') }}</h2>
       <v-spacer />
-      <v-btn color="primary" prepend-icon="mdi-plus" @click="dialog = true">
+      <v-btn color="primary" rounded="lg" prepend-icon="mdi-plus" @click="dialog = true">
         {{ t('trips.newTrip') }}
       </v-btn>
     </div>
 
-    <v-card v-if="trips.length === 0" variant="tonal" class="text-center pa-8">
+    <v-card v-if="trips.length === 0" variant="tonal" rounded="lg" class="text-center pa-8">
       <v-icon size="64" color="grey">mdi-bag-suitcase</v-icon>
       <p class="mt-3 text-medium-emphasis">{{ t('trips.empty') }}</p>
+      <v-btn color="primary" rounded="lg" class="mt-4" prepend-icon="mdi-plus" @click="dialog = true">
+        {{ t('trips.newTrip') }}
+      </v-btn>
     </v-card>
 
-    <v-list v-else lines="two">
-      <v-list-item
+    <div v-else class="d-flex flex-column ga-3">
+      <v-card
         v-for="trip in trips"
         :key="trip.id"
-        :title="trip.name"
-        :subtitle="
-          t('trips.summary', {
-            people: trip.people.length,
-            items: trip.expenses.length,
-            currency: trip.currency,
-          })
-        "
+        rounded="lg"
+        elevation="1"
         @click="openTrip(trip.id)"
       >
-        <template #prepend>
-          <v-avatar color="primary" variant="tonal">
-            <v-icon>mdi-bag-suitcase</v-icon>
-          </v-avatar>
-        </template>
-        <template #append>
-          <v-btn
-            icon="mdi-delete-outline"
-            variant="text"
-            size="small"
-            color="grey"
-            @click.stop="askDelete(trip)"
-          />
-        </template>
-      </v-list-item>
-    </v-list>
+        <v-list-item class="py-3">
+          <template #prepend>
+            <v-avatar color="primary" variant="tonal" size="46">
+              <v-icon>mdi-bag-suitcase</v-icon>
+            </v-avatar>
+          </template>
+          <v-list-item-title class="text-subtitle-1 font-weight-medium">
+            {{ trip.name }}
+          </v-list-item-title>
+          <v-list-item-subtitle>
+            {{
+              t('trips.summary', {
+                people: trip.people.length,
+                items: trip.expenses.length,
+                currency: trip.currency,
+              })
+            }}
+          </v-list-item-subtitle>
+          <template #append>
+            <v-btn
+              icon="mdi-delete-outline"
+              variant="text"
+              size="small"
+              color="grey"
+              @click.stop="askDelete(trip)"
+            />
+          </template>
+        </v-list-item>
+      </v-card>
+    </div>
 
+    <!-- Create trip -->
     <v-dialog v-model="dialog" max-width="420">
-      <v-card>
+      <v-card rounded="lg">
         <v-card-title>{{ t('trips.newTrip') }}</v-card-title>
         <v-card-text>
-          <v-text-field
-            v-model="name"
-            :label="t('trips.name')"
-            autofocus
-            @keyup.enter="createTrip"
-          />
+          <v-text-field v-model="name" :label="t('trips.name')" autofocus @keyup.enter="createTrip" />
           <v-combobox v-model="currency" :items="currencies" :label="t('trips.currency')" />
         </v-card-text>
         <v-card-actions>
@@ -110,8 +117,9 @@ function confirmDelete() {
       </v-card>
     </v-dialog>
 
+    <!-- Delete confirmation -->
     <v-dialog :model-value="!!pendingDelete" max-width="420" @update:model-value="pendingDelete = null">
-      <v-card>
+      <v-card rounded="lg">
         <v-card-title class="text-error">{{ t('trips.deleteTitle') }}</v-card-title>
         <v-card-text>
           <i18n-t keypath="trips.deleteBody" tag="span">

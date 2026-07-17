@@ -15,6 +15,12 @@ export default {
     add: 'Add',
     items: 'Items',
   },
+  summary: {
+    total: 'Total spent',
+    perPerson: 'Per person',
+    people: 'People',
+    items: 'Items',
+  },
   trips: {
     heading: 'Your trips',
     newTrip: 'New trip',
@@ -62,6 +68,7 @@ export default {
     update: 'Update item',
     empty: 'No items yet.',
     paidBy: 'paid by {name}',
+    splitWays: 'split {count} ways',
   },
   common: {
     add: 'Add',

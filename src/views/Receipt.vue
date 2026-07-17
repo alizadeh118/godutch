@@ -5,14 +5,17 @@ import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import { useTripsStore } from '@/stores/trips'
 import { useMoney } from '@/composables/useMoney'
+import { avatarColor, initials } from '@/composables/useAvatar'
 
 const store = useTripsStore()
 const router = useRouter()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { money } = useMoney()
-const { people, balances, settlement, peopleById } = storeToRefs(store)
+const { people, expenses, balances, settlement, peopleById, totalSpent, perPerson } =
+  storeToRefs(store)
 
-const absMoney = (minor: number) => money(Math.abs(minor))
+const isRtl = computed(() => locale.value === 'fa')
+const settleArrow = computed(() => (isRtl.value ? 'mdi-arrow-left' : 'mdi-arrow-right'))
 
 const newName = ref('')
 const nameError = computed(() => {
@@ -32,70 +35,122 @@ function addPerson() {
 function openPerson(id: string) {
   router.push({ name: 'person-receipt', params: { personId: id } })
 }
+
+const balanceOf = (id: string) => balances.value[id] ?? 0
+function balanceLabel(b: number) {
+  if (b < 0) return t('receipt.mustPay')
+  if (b > 0) return t('receipt.getsBack')
+  return t('receipt.settled')
+}
+function balanceChip(b: number) {
+  if (b < 0) return { color: 'error', text: `− ${money(-b)}` }
+  if (b > 0) return { color: 'success', text: `+ ${money(b)}` }
+  return { color: undefined, text: t('receipt.settled') }
+}
 </script>
 
 <template>
-  <div>
-    <div class="d-flex align-center ga-2 mb-2">
-      <v-text-field
-        v-model="newName"
-        :label="t('receipt.newPerson')"
-        :error-messages="nameError"
-        hide-details="auto"
-        density="comfortable"
-        @keyup.enter="addPerson"
-      />
-      <v-btn color="primary" :disabled="!newName.trim() || !!nameError" @click="addPerson">
-        {{ t('common.add') }}
-      </v-btn>
-    </div>
+  <div class="d-flex flex-column ga-4">
+    <!-- Summary -->
+    <v-card v-if="people.length" rounded="lg" elevation="1" class="pa-4">
+      <div class="text-overline text-medium-emphasis">{{ t('summary.total') }}</div>
+      <div class="text-h4 font-weight-bold">{{ money(totalSpent) }}</div>
+      <div class="d-flex ga-8 mt-3">
+        <div>
+          <div class="text-h6">{{ people.length }}</div>
+          <div class="text-caption text-medium-emphasis">{{ t('summary.people') }}</div>
+        </div>
+        <div>
+          <div class="text-h6">{{ expenses.length }}</div>
+          <div class="text-caption text-medium-emphasis">{{ t('summary.items') }}</div>
+        </div>
+        <div>
+          <div class="text-h6">{{ money(perPerson) }}</div>
+          <div class="text-caption text-medium-emphasis">{{ t('summary.perPerson') }}</div>
+        </div>
+      </div>
+    </v-card>
 
-    <v-list v-if="people.length" lines="two">
-      <v-list-item
-        v-for="person in people"
-        :key="person.id"
-        :title="`${person.name} — ${absMoney(balances[person.id] ?? 0)}`"
-        @click="openPerson(person.id)"
-      >
-        <template #subtitle>
-          <span v-if="(balances[person.id] ?? 0) < 0" class="text-error">
-            {{ t('receipt.mustPay') }}
-          </span>
-          <span v-else-if="(balances[person.id] ?? 0) > 0" class="text-success">
-            {{ t('receipt.getsBack') }}
-          </span>
-          <span v-else class="text-medium-emphasis">{{ t('receipt.settled') }}</span>
-        </template>
-        <template #append>
-          <v-icon color="grey">mdi-chevron-right</v-icon>
-        </template>
-      </v-list-item>
-    </v-list>
+    <!-- Add person -->
+    <v-text-field
+      v-model="newName"
+      :label="t('receipt.newPerson')"
+      :error-messages="nameError"
+      variant="solo-filled"
+      flat
+      rounded="lg"
+      hide-details="auto"
+      prepend-inner-icon="mdi-account-plus"
+      @keyup.enter="addPerson"
+    >
+      <template #append-inner>
+        <v-btn
+          icon="mdi-plus"
+          size="small"
+          color="primary"
+          variant="flat"
+          :disabled="!newName.trim() || !!nameError"
+          @click="addPerson"
+        />
+      </template>
+    </v-text-field>
 
-    <v-card v-else variant="tonal" class="text-center pa-8">
+    <!-- People & balances -->
+    <v-card v-if="people.length" rounded="lg" elevation="1">
+      <v-list class="py-0">
+        <template v-for="(person, i) in people" :key="person.id">
+          <v-list-item class="py-2" @click="openPerson(person.id)">
+            <template #prepend>
+              <v-avatar :color="avatarColor(person.name)" size="42">
+                <span class="text-white font-weight-medium">{{ initials(person.name) }}</span>
+              </v-avatar>
+            </template>
+            <v-list-item-title class="font-weight-medium">{{ person.name }}</v-list-item-title>
+            <v-list-item-subtitle>{{ balanceLabel(balanceOf(person.id)) }}</v-list-item-subtitle>
+            <template #append>
+              <v-chip
+                :color="balanceChip(balanceOf(person.id)).color"
+                variant="tonal"
+                size="small"
+                label
+              >
+                {{ balanceChip(balanceOf(person.id)).text }}
+              </v-chip>
+            </template>
+          </v-list-item>
+          <v-divider v-if="i < people.length - 1" inset />
+        </template>
+      </v-list>
+    </v-card>
+
+    <v-card v-else variant="tonal" rounded="lg" class="text-center pa-8">
       <v-icon size="64" color="grey">mdi-account-group-outline</v-icon>
       <p class="mt-3 text-medium-emphasis">{{ t('receipt.empty') }}</p>
     </v-card>
 
-    <template v-if="settlement.length">
-      <v-divider class="my-4" />
-      <h3 class="text-subtitle-1 mb-2">{{ t('receipt.settleUp') }}</h3>
-      <v-list density="compact">
-        <v-list-item v-for="(txn, i) in settlement" :key="i">
-          <template #prepend>
-            <v-icon color="primary" class="me-2">mdi-arrow-right-thin</v-icon>
-          </template>
-          <v-list-item-title>
-            {{
-              t('receipt.pays', {
-                from: peopleById[txn.from],
-                to: peopleById[txn.to],
-                amount: money(txn.amount),
-              })
-            }}
-          </v-list-item-title>
+    <!-- Settle up -->
+    <v-card v-if="settlement.length" rounded="lg" elevation="2" color="primary" variant="tonal">
+      <v-card-title class="d-flex align-center ga-2 text-subtitle-1">
+        <v-icon>mdi-swap-horizontal</v-icon>
+        {{ t('receipt.settleUp') }}
+      </v-card-title>
+      <v-list class="bg-transparent py-0">
+        <v-list-item v-for="(txn, i) in settlement" :key="i" class="py-2">
+          <div class="d-flex align-center ga-2 flex-wrap">
+            <v-avatar :color="avatarColor(peopleById[txn.from])" size="28">
+              <span class="text-caption text-white">{{ initials(peopleById[txn.from]) }}</span>
+            </v-avatar>
+            <span class="font-weight-medium">{{ peopleById[txn.from] }}</span>
+            <v-icon size="small" class="text-medium-emphasis">{{ settleArrow }}</v-icon>
+            <v-avatar :color="avatarColor(peopleById[txn.to])" size="28">
+              <span class="text-caption text-white">{{ initials(peopleById[txn.to]) }}</span>
+            </v-avatar>
+            <span class="font-weight-medium">{{ peopleById[txn.to] }}</span>
+            <v-spacer />
+            <span class="font-weight-bold">{{ money(txn.amount) }}</span>
+          </div>
         </v-list-item>
       </v-list>
-    </template>
+    </v-card>
   </div>
 </template>

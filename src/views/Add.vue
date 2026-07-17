@@ -22,8 +22,20 @@ async function save() {
 
 <template>
   <div>
-    <ExpenseForm ref="formRef" @submit="onSubmit" />
-    <v-btn color="primary" block class="mt-4" @click="save">{{ t('expense.addItem') }}</v-btn>
+    <v-card rounded="lg" elevation="1" class="pa-4">
+      <ExpenseForm ref="formRef" @submit="onSubmit" />
+      <v-btn
+        color="primary"
+        block
+        size="large"
+        rounded="lg"
+        class="mt-2"
+        prepend-icon="mdi-check"
+        @click="save"
+      >
+        {{ t('expense.addItem') }}
+      </v-btn>
+    </v-card>
 
     <v-snackbar v-model="snackbar" timeout="1500" color="success">
       {{ t('expense.added') }}
