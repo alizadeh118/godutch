@@ -29,6 +29,17 @@ function detectLocale(): LocaleCode {
 
 export const initialLocale = detectLocale()
 
+const PERSIAN_DIGITS = '۰۱۲۳۴۵۶۷۸۹'
+
+/** Convert ASCII digits (0-9) in a string to Persian digits (۰-۹). */
+export function toPersianDigits(input: string): string {
+  return input.replace(/[0-9]/g, (d) => PERSIAN_DIGITS[Number(d)])
+}
+
+// Tracked separately so the postTranslation hook (below) can read the active
+// locale without referencing the not-yet-created i18n instance.
+let currentLocale: LocaleCode = initialLocale
+
 const i18n = createI18n({
   legacy: false,
   locale: initialLocale,
@@ -39,6 +50,12 @@ const i18n = createI18n({
     en: { $vuetify: vuetifyEn, ...en },
     fa: { $vuetify: vuetifyFa, ...fa },
   },
+  // Persian renders every number with Persian digits — applied once here so
+  // all t() output (including interpolated counts) is covered.
+  postTranslation: (translated) =>
+    typeof translated === 'string' && currentLocale === 'fa'
+      ? toPersianDigits(translated)
+      : translated,
 })
 
 export function localeMeta(code: LocaleCode): LocaleMeta {
@@ -48,6 +65,7 @@ export function localeMeta(code: LocaleCode): LocaleMeta {
 /** Apply a locale everywhere: i18n, <html lang/dir>, and persistence. */
 export function setLocale(code: LocaleCode) {
   i18n.global.locale.value = code
+  currentLocale = code
   const meta = localeMeta(code)
   document.documentElement.setAttribute('lang', code)
   document.documentElement.setAttribute('dir', meta.dir)

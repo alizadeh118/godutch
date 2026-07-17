@@ -57,11 +57,11 @@ function balanceChip(b: number) {
       <div class="text-h4 font-weight-bold">{{ format(totalSpent) }}</div>
       <div class="d-flex ga-8 mt-3">
         <div>
-          <div class="text-h6">{{ people.length }}</div>
+          <div class="text-h6">{{ format(people.length) }}</div>
           <div class="text-caption text-medium-emphasis">{{ t('summary.people') }}</div>
         </div>
         <div>
-          <div class="text-h6">{{ expenses.length }}</div>
+          <div class="text-h6">{{ format(expenses.length) }}</div>
           <div class="text-caption text-medium-emphasis">{{ t('summary.items') }}</div>
         </div>
         <div>
