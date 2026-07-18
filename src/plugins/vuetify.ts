@@ -1,6 +1,10 @@
 import 'vuetify/styles'
 import '@mdi/font/css/materialdesignicons.css'
-// Vazirmatn covers both Latin and Persian glyphs; self-hosted for offline PWA use.
+// Inter for Latin text (English pages); Vazirmatn covers Persian glyphs that
+// Inter lacks, so Persian falls back to it per-glyph. Both self-hosted for PWA.
+import '@fontsource/inter/400.css'
+import '@fontsource/inter/500.css'
+import '@fontsource/inter/700.css'
 import '@fontsource/vazirmatn/400.css'
 import '@fontsource/vazirmatn/500.css'
 import '@fontsource/vazirmatn/700.css'

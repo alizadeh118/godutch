@@ -1,6 +1,8 @@
 // Vuetify SASS variable overrides. Compiled by vite-plugin-vuetify via the
 // `styles.configFile` option so ALL Vuetify typography (.text-h6, buttons,
 // lists, etc.) uses Vazirmatn — which also covers Persian glyphs.
+// Inter is Latin-only, so Latin text uses it and Persian glyphs fall back to
+// Vazirmatn per-glyph — English pages get Inter, Persian pages get Vazirmatn.
 @use 'vuetify/settings' with (
-  $body-font-family: ('Vazirmatn', 'Roboto', sans-serif)
+  $body-font-family: ('Inter', 'Vazirmatn', 'Roboto', sans-serif)
 );
